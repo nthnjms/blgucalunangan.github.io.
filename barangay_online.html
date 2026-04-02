@@ -1,0 +1,1245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Barangay Online System</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:ital,wght@0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #0c1e3c;
+  --navy2: #162d52;
+  --navy3: #1e3e70;
+  --gold: #c8963e;
+  --gold2: #e8b45a;
+  --bg: #f2f5f9;
+  --white: #ffffff;
+  --border: #dde3ed;
+  --text: #0f1f36;
+  --text2: #4a5a72;
+  --text3: #8a98ad;
+  --success: #1a9e5c;
+  --danger: #d63939;
+  --warning: #c87a1a;
+  --info: #1a6ed6;
+  --r: 10px;
+  --r2: 14px;
+  --sh: 0 1px 4px rgba(12,30,60,0.08);
+  --sh2: 0 4px 20px rgba(12,30,60,0.13);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;height:100vh;overflow:hidden;font-size:14px}
+
+/* ── SIDEBAR ── */
+#sb{width:238px;min-width:238px;background:var(--navy);display:flex;flex-direction:column;overflow-y:auto;transition:width .2s}
+#sb-head{padding:20px 16px 14px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.sb-logo-wrap{display:flex;align-items:center;gap:11px;margin-bottom:10px;cursor:pointer;position:relative}
+.sb-logo{width:44px;height:44px;border-radius:50%;border:2px solid var(--gold);object-fit:cover;background:var(--navy3);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:18px;color:var(--gold);flex-shrink:0;overflow:hidden}
+.sb-logo img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.sb-logo-edit{position:absolute;bottom:0;left:28px;width:18px;height:18px;background:var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--navy)}
+.sb-brgy{font-size:13px;font-weight:700;color:#fff;line-height:1.3}
+.sb-loc{font-size:10px;color:rgba(255,255,255,0.45);margin-top:1px}
+.nav-sec{padding:12px 12px 4px;font-size:9.5px;color:rgba(255,255,255,0.3);letter-spacing:.1em;text-transform:uppercase;font-weight:700}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 11px;margin:1px 8px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,0.65);font-size:13px;font-weight:500;transition:all .15s;position:relative}
+.nav-item:hover{background:rgba(255,255,255,0.07);color:#fff}
+.nav-item.active{background:linear-gradient(90deg,var(--navy3),var(--navy2));color:#fff;box-shadow:inset 2px 0 0 var(--gold)}
+.nav-item .ni{font-size:15px;width:20px;text-align:center}
+.nav-badge{margin-left:auto;background:var(--gold);color:var(--navy);font-size:10px;font-weight:700;border-radius:20px;padding:1px 7px}
+#sb-foot{margin-top:auto;padding:12px;border-top:1px solid rgba(255,255,255,0.07)}
+.user-row{display:flex;align-items:center;gap:10px;cursor:pointer}
+.user-av{width:34px;height:34px;border-radius:50%;background:var(--navy3);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:var(--gold);flex-shrink:0;overflow:hidden}
+.user-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.user-name{font-size:12px;font-weight:700;color:#fff}
+.user-role{font-size:10px;color:rgba(255,255,255,0.45)}
+.logout-btn{margin-left:auto;font-size:10px;color:rgba(255,255,255,0.4);cursor:pointer;padding:4px 8px;border-radius:6px;transition:.15s}
+.logout-btn:hover{background:rgba(255,255,255,0.08);color:#fff}
+
+/* ── MAIN ── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#topbar{background:var(--white);border-bottom:1px solid var(--border);padding:0 24px;height:58px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh)}
+#tb-title{font-family:'Fraunces',serif;font-size:19px;color:var(--text);font-weight:600}
+#tb-right{display:flex;align-items:center;gap:14px}
+.tb-date{font-size:12px;color:var(--text3)}
+.tb-chip{background:var(--navy);color:var(--gold);font-size:11px;font-weight:600;padding:5px 12px;border-radius:20px}
+#content{flex:1;overflow-y:auto;padding:24px}
+
+/* ── PAGES ── */
+.page{display:none}.page.active{display:block}
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:22px;flex-wrap:wrap;gap:10px}
+.page-ttl{font-family:'Fraunces',serif;font-size:22px;font-weight:600;color:var(--text)}
+
+/* ── CARDS ── */
+.card{background:var(--white);border-radius:var(--r2);border:1px solid var(--border);padding:20px 22px;box-shadow:var(--sh)}
+.card-ttl{font-size:15px;font-weight:700;color:var(--text);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:13px;margin-bottom:22px}
+.stat-card{background:var(--white);border-radius:var(--r2);border:1px solid var(--border);padding:18px 20px;box-shadow:var(--sh);position:relative;overflow:hidden}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,var(--navy),var(--gold))}
+.stat-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.stat-val{font-size:26px;font-weight:700;color:var(--text);line-height:1;font-family:'Fraunces',serif}
+.stat-sub{font-size:11px;color:var(--text3);margin-top:4px}
+.stat-ico{position:absolute;top:16px;right:16px;font-size:22px;opacity:.25}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;color:var(--text3);font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:10px 14px;text-align:left;border-bottom:1.5px solid var(--border);background:#f8fafc;white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#f8fafc}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.bs{background:#d1fae5;color:#065f46}
+.bw{background:#fef3c7;color:#78350f}
+.bd{background:#fee2e2;color:#7f1d1d}
+.bi{background:#dbeafe;color:#1e3a8a}
+.bg{background:#f1f5f9;color:#334155}
+.bp{background:#ede9fe;color:#3b0764}
+
+/* ── FORMS ── */
+.form-group{margin-bottom:15px}
+.form-lbl{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px}
+.form-ctrl{width:100%;padding:10px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none;transition:border-color .2s;color:var(--text);background:#fff}
+.form-ctrl:focus{border-color:var(--navy3)}
+textarea.form-ctrl{resize:vertical}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.form-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 18px;border-radius:var(--r);border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;transition:all .15s}
+.btn-primary{background:var(--navy);color:#fff}.btn-primary:hover{background:var(--navy3)}
+.btn-gold{background:var(--gold);color:var(--navy)}.btn-gold:hover{background:var(--gold2)}
+.btn-success{background:var(--success);color:#fff}
+.btn-danger{background:var(--danger);color:#fff}
+.btn-ghost{background:transparent;color:var(--text2);border:1.5px solid var(--border)}.btn-ghost:hover{background:var(--bg)}
+.btn-sm{padding:6px 11px;font-size:12px}
+.btn-full{width:100%}
+
+/* ── SEARCH BAR ── */
+.srch-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap}
+.srch-input{flex:1;min-width:180px;padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none;background:#fff;color:var(--text)}
+.srch-input:focus{border-color:var(--navy3)}
+.srch-sel{padding:9px 13px;border:1.5px solid var(--border);border-radius:var(--r);font-size:13px;font-family:inherit;outline:none;background:#fff;color:var(--text);cursor:pointer}
+
+/* ── MODAL ── */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(12,30,60,0.55);z-index:500;align-items:center;justify-content:center;backdrop-filter:blur(2px)}
+.modal-ov.open{display:flex}
+.modal{background:#fff;border-radius:var(--r2);padding:28px;width:560px;max-width:96vw;max-height:92vh;overflow-y:auto;box-shadow:var(--sh2);animation:modalIn .18s ease}
+@keyframes modalIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+.modal-ttl{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin-bottom:20px;color:var(--text)}
+.modal-foot{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border)}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:2px;border-bottom:2px solid var(--border);margin-bottom:20px}
+.tab{padding:8px 16px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:.15s}
+.tab.active{color:var(--navy);border-bottom-color:var(--navy)}
+
+/* ── LOGIN ── */
+#login-sc{position:fixed;inset:0;background:linear-gradient(135deg,var(--navy) 0%,#1a3a70 100%);display:flex;align-items:center;justify-content:center;z-index:1000}
+.login-box{background:#fff;border-radius:18px;padding:42px 38px;width:380px;box-shadow:0 24px 64px rgba(0,0,0,0.35)}
+.login-logo-wrap{display:flex;flex-direction:column;align-items:center;margin-bottom:24px;position:relative}
+.login-logo{width:70px;height:70px;border-radius:50%;border:3px solid var(--gold);object-fit:cover;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-size:26px;color:var(--gold);overflow:hidden;cursor:pointer}
+.login-logo img{width:100%;height:100%;object-fit:cover}
+.login-logo-hint{font-size:10px;color:var(--text3);margin-top:8px;text-align:center}
+.login-brgy{font-family:'Fraunces',serif;font-size:20px;font-weight:600;color:var(--text);text-align:center;margin-bottom:4px}
+.login-sub{font-size:12px;color:var(--text3);text-align:center;margin-bottom:26px}
+.divider{text-align:center;margin:14px 0;font-size:11px;color:var(--text3)}
+
+/* ── UPLOAD AVATAR ── */
+.upload-ring{width:90px;height:90px;border-radius:50%;border:3px dashed var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex-direction:column;gap:4px;overflow:hidden;background:var(--bg)}
+.upload-ring:hover{border-color:var(--gold);background:#fef9f0}
+.upload-ring img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.upload-ring span{font-size:11px;color:var(--text3)}
+
+/* ── AI CHAT ── */
+.ai-box{background:linear-gradient(135deg,#0c1e3c,#1a3e70);border-radius:var(--r2);padding:20px;margin-top:20px;color:#fff}
+.ai-box-ttl{font-size:13px;font-weight:700;color:var(--gold2);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.ai-input-row{display:flex;gap:10px}
+.ai-input{flex:1;padding:10px 13px;border-radius:var(--r);border:1.5px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.08);color:#fff;font-size:13px;font-family:inherit;outline:none}
+.ai-input::placeholder{color:rgba(255,255,255,0.4)}
+.ai-input:focus{border-color:var(--gold)}
+.ai-resp{margin-top:12px;font-size:13px;color:rgba(255,255,255,0.85);line-height:1.7;min-height:40px;white-space:pre-wrap}
+.ai-thinking{color:var(--gold2);font-size:12px;animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* ── CHART ── */
+.bar-wrap{display:flex;flex-direction:column;gap:10px}
+.bar-item{display:flex;align-items:center;gap:10px}
+.bar-lbl{font-size:11px;color:var(--text2);width:120px;text-align:right;flex-shrink:0}
+.bar-track{flex:1;background:var(--bg);border-radius:4px;height:13px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width .7s ease}
+.bar-val{font-size:11px;font-weight:700;color:var(--text2);width:32px}
+
+/* ── CITIZEN CARD (PROFILE) ── */
+.cit-profile{display:flex;align-items:center;gap:12px}
+.cit-av{width:38px;height:38px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;color:var(--gold);flex-shrink:0;overflow:hidden}
+.cit-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:860px){.grid2{grid-template-columns:1fr}.form-row{grid-template-columns:1fr}}
+.empty{text-align:center;padding:48px 20px;color:var(--text3)}
+.empty-ico{font-size:38px;margin-bottom:10px}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:10px}
+
+/* ONLINE INDICATOR */
+.online-dot{width:8px;height:8px;border-radius:50%;background:#22c55e;display:inline-block;margin-right:5px;animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* RESIDENT PORTAL TAB */
+.portal-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px}
+.portal-card{background:var(--white);border-radius:var(--r2);border:1px solid var(--border);padding:22px 18px;text-align:center;cursor:pointer;transition:all .2s;box-shadow:var(--sh)}
+.portal-card:hover{border-color:var(--navy3);box-shadow:var(--sh2);transform:translateY(-2px)}
+.portal-card .pc-ico{font-size:32px;margin-bottom:10px}
+.portal-card .pc-name{font-size:14px;font-weight:700;color:var(--text)}
+.portal-card .pc-desc{font-size:11px;color:var(--text3);margin-top:4px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-sc">
+  <div class="login-box">
+    <div class="login-logo-wrap">
+      <div class="login-logo" id="login-logo-disp" onclick="document.getElementById('logo-upload-login').click()">
+        <span id="login-logo-letter">B</span>
+      </div>
+      <div class="login-logo-hint">Click logo to upload your barangay seal</div>
+      <input type="file" id="logo-upload-login" accept="image/*" style="display:none" onchange="uploadLogo(this,'login')">
+    </div>
+    <div class="login-brgy" id="login-brgy-name">Barangay System</div>
+    <div class="login-sub">Integrated Online Management Platform</div>
+    <div class="form-group">
+      <label class="form-lbl">Role</label>
+      <select class="form-ctrl" id="login-role">
+        <option>Barangay Captain</option>
+        <option>Barangay Staff</option>
+        <option>Barangay Treasurer</option>
+        <option>Barangay Secretary</option>
+        <option>Resident / Citizen</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-lbl">Username</label>
+      <input class="form-ctrl" id="login-user" value="admin" placeholder="Username">
+    </div>
+    <div class="form-group">
+      <label class="form-lbl">Password</label>
+      <input class="form-ctrl" type="password" id="login-pass" value="1234" placeholder="Password">
+    </div>
+    <button class="btn btn-primary btn-full" onclick="doLogin()">Login to System</button>
+    <div class="divider">Default password: 1234</div>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sb">
+  <div id="sb-head">
+    <div class="sb-logo-wrap" onclick="document.getElementById('logo-upload-sb').click()" title="Click to change logo">
+      <div class="sb-logo" id="sb-logo-disp">
+        <span id="sb-logo-letter">B</span>
+      </div>
+      <div class="sb-logo-edit">✏</div>
+      <div>
+        <div class="sb-brgy" id="sb-brgy-name">Barangay System</div>
+        <div class="sb-loc" id="sb-loc-name">Online Platform</div>
+      </div>
+      <input type="file" id="logo-upload-sb" accept="image/*" style="display:none" onchange="uploadLogo(this,'sb')">
+    </div>
+  </div>
+
+  <div class="nav-sec">Main</div>
+  <div class="nav-item active" onclick="nav('dashboard')"><span class="ni">📊</span> Dashboard</div>
+  <div class="nav-item" onclick="nav('citizens')"><span class="ni">👥</span> Citizens</div>
+  <div class="nav-item" onclick="nav('documents')" id="nav-docs"><span class="ni">📄</span> Document Requests</div>
+  <div class="nav-item" onclick="nav('portal')"><span class="ni">🌐</span> Resident Portal</div>
+  <div class="nav-sec">Finance</div>
+  <div class="nav-item" onclick="nav('finance')"><span class="ni">💰</span> Finance / Treasury</div>
+  <div class="nav-sec">Operations</div>
+  <div class="nav-item" onclick="nav('blotter')"><span class="ni">📋</span> Blotter</div>
+  <div class="nav-item" onclick="nav('officials')"><span class="ni">🏛️</span> Officials</div>
+  <div class="nav-sec">AI Tools</div>
+  <div class="nav-item" onclick="nav('ai')"><span class="ni">🤖</span> AI Assistant</div>
+  <div class="nav-sec">System</div>
+  <div class="nav-item" onclick="nav('settings')"><span class="ni">⚙️</span> Settings</div>
+
+  <div id="sb-foot">
+    <div class="user-row">
+      <div class="user-av" id="user-av-disp">
+        <span id="user-av-letter">A</span>
+      </div>
+      <div>
+        <div class="user-name" id="u-name">Admin</div>
+        <div class="user-role"><span class="online-dot"></span><span id="u-role">Captain</span></div>
+      </div>
+      <div class="logout-btn" onclick="doLogout()">Out</div>
+    </div>
+    <div style="margin-top:10px;">
+      <label style="font-size:10px;color:rgba(255,255,255,0.35);cursor:pointer;" onclick="document.getElementById('avatar-upload').click()">Change profile photo</label>
+      <input type="file" id="avatar-upload" accept="image/*" style="display:none" onchange="uploadLogo(this,'avatar')">
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div id="main">
+  <div id="topbar">
+    <div id="tb-title">Dashboard</div>
+    <div id="tb-right">
+      <span class="tb-date" id="tb-date"></span>
+      <span class="tb-chip"><span class="online-dot"></span>Online</span>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+  <div id="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-hdr">
+        <div class="page-ttl" id="dash-welcome">Welcome back!</div>
+        <button class="btn btn-gold btn-sm" onclick="nav('ai')">🤖 Ask AI Assistant</button>
+      </div>
+      <div class="stat-grid" id="dash-stats"></div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-ttl">Document Requests by Type</div>
+          <div class="bar-wrap" id="dash-doc-chart"></div>
+        </div>
+        <div class="card">
+          <div class="card-ttl">Treasury Summary</div>
+          <div id="dash-fin-sum"></div>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-ttl">Recent Blotter Entries</div>
+        <div class="tbl-wrap" id="dash-blotter"></div>
+      </div>
+    </div>
+
+    <!-- CITIZENS -->
+    <div class="page" id="page-citizens">
+      <div class="page-hdr">
+        <div class="page-ttl">Citizen Records</div>
+        <button class="btn btn-primary" onclick="openM('citizen')">+ Add Citizen</button>
+      </div>
+      <div class="card">
+        <div class="srch-bar">
+          <input class="srch-input" placeholder="Search by name, ID, address..." id="cit-srch" oninput="renderCitizens()">
+          <select class="srch-sel" id="cit-f-status" onchange="renderCitizens()">
+            <option value="">All Status</option><option>Active</option><option>Deceased</option><option>Transferred</option>
+          </select>
+          <select class="srch-sel" id="cit-f-gender" onchange="renderCitizens()">
+            <option value="">All Gender</option><option>Male</option><option>Female</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>ID</th><th>Name</th><th>Age</th><th>Gender</th><th>Address / Purok</th><th>Contact</th><th>Voter</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="cit-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- DOCUMENTS -->
+    <div class="page" id="page-documents">
+      <div class="page-hdr">
+        <div class="page-ttl">Document Requests</div>
+        <button class="btn btn-primary" onclick="openM('document')">+ New Request</button>
+      </div>
+      <div class="card">
+        <div class="srch-bar">
+          <input class="srch-input" placeholder="Search by name or control no..." id="doc-srch" oninput="renderDocs()">
+          <select class="srch-sel" id="doc-f-type" onchange="renderDocs()">
+            <option value="">All Types</option>
+            <option>Barangay Clearance</option><option>Barangay Indigency</option><option>Barangay Residency</option>
+            <option>Community Tax Certificate</option><option>Business Permit</option><option>Good Moral Certificate</option>
+          </select>
+          <select class="srch-sel" id="doc-f-status" onchange="renderDocs()">
+            <option value="">All Status</option><option>Pending</option><option>Approved</option><option>Ready for Pickup</option><option>Released</option><option>Rejected</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>Control No.</th><th>Requestor</th><th>Document</th><th>Date Filed</th><th>Purpose</th><th>Fee</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="doc-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESIDENT PORTAL -->
+    <div class="page" id="page-portal">
+      <div class="page-hdr">
+        <div class="page-ttl">Resident Portal</div>
+        <span class="badge bi">Open to Residents</span>
+      </div>
+      <p style="color:var(--text2);margin-bottom:20px;font-size:13px;">Residents can request documents and check status online. Select a service below:</p>
+      <div class="portal-grid">
+        <div class="portal-card" onclick="portalRequest('Barangay Clearance')">
+          <div class="pc-ico">📜</div>
+          <div class="pc-name">Barangay Clearance</div>
+          <div class="pc-desc">For employment, loan, travel</div>
+        </div>
+        <div class="portal-card" onclick="portalRequest('Barangay Indigency')">
+          <div class="pc-ico">🤝</div>
+          <div class="pc-name">Certificate of Indigency</div>
+          <div class="pc-desc">For medical, scholarship, legal aid</div>
+        </div>
+        <div class="portal-card" onclick="portalRequest('Barangay Residency')">
+          <div class="pc-ico">🏠</div>
+          <div class="pc-name">Certificate of Residency</div>
+          <div class="pc-desc">Proof of address / residency</div>
+        </div>
+        <div class="portal-card" onclick="portalRequest('Community Tax Certificate')">
+          <div class="pc-ico">🪪</div>
+          <div class="pc-name">Community Tax Certificate</div>
+          <div class="pc-desc">Cedula / CTC for official use</div>
+        </div>
+        <div class="portal-card" onclick="portalRequest('Good Moral Certificate')">
+          <div class="pc-ico">⭐</div>
+          <div class="pc-name">Good Moral Certificate</div>
+          <div class="pc-desc">For school, work applications</div>
+        </div>
+        <div class="portal-card" onclick="portalRequest('Business Permit')">
+          <div class="pc-ico">🏪</div>
+          <div class="pc-name">Business Permit</div>
+          <div class="pc-desc">Barangay business clearance</div>
+        </div>
+      </div>
+      <div class="card" id="portal-form-area" style="display:none;max-width:600px;">
+        <div class="card-ttl" id="portal-form-title">Request Form</div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-lbl">Full Name *</label><input class="form-ctrl" id="prt-name"></div>
+          <div class="form-group"><label class="form-lbl">Address / Purok *</label><input class="form-ctrl" id="prt-addr"></div>
+        </div>
+        <div class="form-group"><label class="form-lbl">Purpose *</label><input class="form-ctrl" id="prt-purpose" placeholder="e.g., Employment, Scholarship, etc."></div>
+        <div class="form-row">
+          <div class="form-group"><label class="form-lbl">Contact Number</label><input class="form-ctrl" id="prt-contact" placeholder="09XXXXXXXXX"></div>
+          <div class="form-group"><label class="form-lbl">Email (optional)</label><input class="form-ctrl" id="prt-email" type="email"></div>
+        </div>
+        <div class="modal-foot" style="padding-top:0;border:none;justify-content:flex-start;gap:10px;">
+          <button class="btn btn-primary" onclick="submitPortalRequest()">Submit Request</button>
+          <button class="btn btn-ghost" onclick="document.getElementById('portal-form-area').style.display='none'">Cancel</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px;">
+        <div class="card-ttl">Track Your Request</div>
+        <div class="srch-bar" style="margin-bottom:12px;">
+          <input class="srch-input" placeholder="Enter Control No. (e.g. DOC-000001)" id="track-input">
+          <button class="btn btn-primary" onclick="trackRequest()">Track</button>
+        </div>
+        <div id="track-result"></div>
+      </div>
+    </div>
+
+    <!-- FINANCE -->
+    <div class="page" id="page-finance">
+      <div class="page-hdr">
+        <div class="page-ttl">Finance / Treasury</div>
+        <button class="btn btn-primary" onclick="openM('finance')">+ Add Transaction</button>
+      </div>
+      <div class="stat-grid" id="fin-stats"></div>
+      <div class="card">
+        <div class="card-ttl">
+          Transaction Ledger
+          <select class="srch-sel" id="fin-f-type" onchange="renderFinance()"><option value="">All</option><option>Income</option><option>Expense</option></select>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>Date</th><th>Type</th><th>Category</th><th>Description</th><th>Amount</th><th>OR No.</th><th>Action</th></tr></thead>
+          <tbody id="fin-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOTTER -->
+    <div class="page" id="page-blotter">
+      <div class="page-hdr">
+        <div class="page-ttl">Barangay Blotter</div>
+        <button class="btn btn-primary" onclick="openM('blotter')">+ New Incident</button>
+      </div>
+      <div class="card">
+        <div class="srch-bar">
+          <input class="srch-input" placeholder="Search incidents..." id="bl-srch" oninput="renderBlotter()">
+          <select class="srch-sel" id="bl-f-status" onchange="renderBlotter()">
+            <option value="">All Status</option><option>Ongoing</option><option>Settled</option><option>Endorsed to PNP</option>
+          </select>
+        </div>
+        <div class="tbl-wrap">
+          <table><thead><tr><th>Blotter No.</th><th>Date</th><th>Complainant</th><th>Respondent</th><th>Incident</th><th>Location</th><th>Status</th><th>Action</th></tr></thead>
+          <tbody id="bl-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- OFFICIALS -->
+    <div class="page" id="page-officials">
+      <div class="page-hdr">
+        <div class="page-ttl">Barangay Officials</div>
+        <button class="btn btn-primary" onclick="openM('official')">+ Add Official</button>
+      </div>
+      <div class="card">
+        <div class="tbl-wrap">
+          <table><thead><tr><th>Photo</th><th>Name</th><th>Position</th><th>Committee</th><th>Term</th><th>Contact</th><th>Action</th></tr></thead>
+          <tbody id="off-tbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI ASSISTANT -->
+    <div class="page" id="page-ai">
+      <div class="page-hdr"><div class="page-ttl">AI Assistant</div></div>
+      <div class="card">
+        <div class="card-ttl">Quick Queries</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
+          <button class="btn btn-ghost btn-sm" onclick="aiQuery('How many citizens are currently active?')">Active citizens count</button>
+          <button class="btn btn-ghost btn-sm" onclick="aiQuery('What documents are pending release?')">Pending documents</button>
+          <button class="btn btn-ghost btn-sm" onclick="aiQuery('Summarize the treasury balance and recent expenses.')">Treasury summary</button>
+          <button class="btn btn-ghost btn-sm" onclick="aiQuery('List all ongoing blotter cases.')">Ongoing blotter cases</button>
+          <button class="btn btn-ghost btn-sm" onclick="aiQuery('Give me a brief report of the barangay status.')">Barangay status report</button>
+        </div>
+      </div>
+      <div class="ai-box">
+        <div class="ai-box-ttl">🤖 Barangay AI Assistant</div>
+        <div class="ai-input-row">
+          <input class="ai-input" id="ai-input" placeholder="Ask anything about your barangay data..." onkeydown="if(event.key==='Enter')sendAI()">
+          <button class="btn btn-gold" onclick="sendAI()">Ask</button>
+        </div>
+        <div class="ai-resp" id="ai-resp">Your AI assistant is ready. Ask about citizens, documents, finance, blotter, or any barangay matter.</div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="page-ttl" style="margin-bottom:22px;">System Settings</div>
+      <div class="grid2">
+        <div class="card">
+          <div class="card-ttl">Barangay Information</div>
+          <div class="form-group"><label class="form-lbl">Barangay Name</label><input class="form-ctrl" id="set-name" placeholder="e.g., Barangay 1"></div>
+          <div class="form-group"><label class="form-lbl">City / Municipality</label><input class="form-ctrl" id="set-city"></div>
+          <div class="form-group"><label class="form-lbl">Province</label><input class="form-ctrl" id="set-prov"></div>
+          <div class="form-group"><label class="form-lbl">Barangay Captain</label><input class="form-ctrl" id="set-captain"></div>
+          <div class="form-group"><label class="form-lbl">Contact Number</label><input class="form-ctrl" id="set-contact"></div>
+          <button class="btn btn-primary" onclick="saveSettings()">Save Settings</button>
+        </div>
+        <div class="card">
+          <div class="card-ttl">Branding / Logo</div>
+          <p style="font-size:13px;color:var(--text2);margin-bottom:16px;">Upload your barangay seal or logo. It will appear on the sidebar and login screen.</p>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:12px;">
+            <div class="upload-ring" id="logo-preview-settings" onclick="document.getElementById('logo-upload-settings').click()">
+              <span style="font-size:24px;">🏛️</span>
+              <span>Upload Logo</span>
+            </div>
+            <input type="file" id="logo-upload-settings" accept="image/*" style="display:none" onchange="uploadLogo(this,'settings')">
+            <button class="btn btn-ghost btn-sm" onclick="document.getElementById('logo-upload-settings').click()">Choose Image</button>
+          </div>
+          <div style="margin-top:20px;padding-top:16px;border-top:1px solid var(--border);">
+            <div class="card-ttl" style="margin-bottom:10px;">System Password</div>
+            <div class="form-group"><label class="form-lbl">New Password</label><input class="form-ctrl" type="password" id="set-pw" placeholder="Leave blank to keep current"></div>
+            <button class="btn btn-ghost btn-sm" onclick="savePassword()">Update Password</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- MODALS -->
+
+<!-- CITIZEN MODAL -->
+<div class="modal-ov" id="m-citizen">
+  <div class="modal">
+    <div class="modal-ttl" id="m-cit-title">Add Citizen</div>
+    <div style="display:flex;align-items:center;gap:16px;margin-bottom:18px;">
+      <div class="upload-ring" style="width:70px;height:70px;" id="cit-photo-prev" onclick="document.getElementById('cit-photo-up').click()">
+        <span style="font-size:20px;">👤</span>
+      </div>
+      <div style="font-size:12px;color:var(--text3);">Click to add<br>citizen photo</div>
+      <input type="file" id="cit-photo-up" accept="image/*" style="display:none" onchange="previewCitPhoto(this)">
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Last Name *</label><input class="form-ctrl" id="c-ln"></div>
+      <div class="form-group"><label class="form-lbl">First Name *</label><input class="form-ctrl" id="c-fn"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Middle Name</label><input class="form-ctrl" id="c-mn"></div>
+      <div class="form-group"><label class="form-lbl">Suffix</label><select class="form-ctrl" id="c-sfx"><option value="">None</option><option>Jr.</option><option>Sr.</option><option>II</option><option>III</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Date of Birth *</label><input class="form-ctrl" type="date" id="c-bd"></div>
+      <div class="form-group"><label class="form-lbl">Gender *</label><select class="form-ctrl" id="c-gnd"><option value="">Select</option><option>Male</option><option>Female</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Civil Status</label><select class="form-ctrl" id="c-cs"><option>Single</option><option>Married</option><option>Widowed</option><option>Separated</option></select></div>
+      <div class="form-group"><label class="form-lbl">Nationality</label><input class="form-ctrl" id="c-nat" value="Filipino"></div>
+    </div>
+    <div class="form-group"><label class="form-lbl">Address / Purok *</label><input class="form-ctrl" id="c-addr"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Contact No.</label><input class="form-ctrl" id="c-con" placeholder="09XXXXXXXXX"></div>
+      <div class="form-group"><label class="form-lbl">Email</label><input class="form-ctrl" id="c-email" type="email"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Occupation</label><input class="form-ctrl" id="c-occ"></div>
+      <div class="form-group"><label class="form-lbl">Voter Status</label><select class="form-ctrl" id="c-voter"><option>Registered Voter</option><option>Not Registered</option></select></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">PWD?</label><select class="form-ctrl" id="c-pwd"><option>No</option><option>Yes</option></select></div>
+      <div class="form-group"><label class="form-lbl">Status</label><select class="form-ctrl" id="c-stat"><option>Active</option><option>Deceased</option><option>Transferred</option></select></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeM('citizen')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveCitizen()">Save Citizen</button>
+    </div>
+  </div>
+</div>
+
+<!-- DOCUMENT MODAL -->
+<div class="modal-ov" id="m-document">
+  <div class="modal">
+    <div class="modal-ttl">New Document Request</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Requestor Name *</label><input class="form-ctrl" id="d-name"></div>
+      <div class="form-group"><label class="form-lbl">Address / Purok</label><input class="form-ctrl" id="d-addr"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Document Type *</label>
+        <select class="form-ctrl" id="d-type">
+          <option>Barangay Clearance</option><option>Barangay Indigency</option><option>Barangay Residency</option>
+          <option>Community Tax Certificate</option><option>Business Permit</option><option>Good Moral Certificate</option><option>Certificate of Live Birth</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-lbl">Date Filed</label><input class="form-ctrl" type="date" id="d-date"></div>
+    </div>
+    <div class="form-group"><label class="form-lbl">Purpose *</label><input class="form-ctrl" id="d-purpose" placeholder="e.g., Employment, School requirement"></div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Fee (₱)</label><input class="form-ctrl" type="number" id="d-fee" value="0" min="0"></div>
+      <div class="form-group"><label class="form-lbl">Status</label><select class="form-ctrl" id="d-stat"><option>Pending</option><option>Approved</option><option>Ready for Pickup</option><option>Released</option><option>Rejected</option></select></div>
+    </div>
+    <div class="form-group"><label class="form-lbl">Remarks</label><input class="form-ctrl" id="d-remarks"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeM('document')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveDoc()">Save Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- FINANCE MODAL -->
+<div class="modal-ov" id="m-finance">
+  <div class="modal">
+    <div class="modal-ttl">Add Transaction</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Type *</label><select class="form-ctrl" id="f-type"><option>Income</option><option>Expense</option></select></div>
+      <div class="form-group"><label class="form-lbl">Date *</label><input class="form-ctrl" type="date" id="f-date"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Category *</label>
+        <select class="form-ctrl" id="f-cat">
+          <option>Document Fees</option><option>IRA Allocation</option><option>Business Permit</option><option>Donations</option>
+          <option>Personnel Salaries</option><option>Office Supplies</option><option>Infrastructure</option>
+          <option>Livelihood Programs</option><option>Health & Sanitation</option><option>Miscellaneous</option>
+        </select>
+      </div>
+      <div class="form-group"><label class="form-lbl">Amount (₱) *</label><input class="form-ctrl" type="number" id="f-amt" min="0"></div>
+    </div>
+    <div class="form-group"><label class="form-lbl">Description</label><input class="form-ctrl" id="f-desc"></div>
+    <div class="form-group"><label class="form-lbl">OR / Reference No.</label><input class="form-ctrl" id="f-or"></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeM('finance')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveFinance()">Save Transaction</button>
+    </div>
+  </div>
+</div>
+
+<!-- BLOTTER MODAL -->
+<div class="modal-ov" id="m-blotter">
+  <div class="modal">
+    <div class="modal-ttl">New Blotter Entry</div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Complainant *</label><input class="form-ctrl" id="b-comp"></div>
+      <div class="form-group"><label class="form-lbl">Respondent *</label><input class="form-ctrl" id="b-resp"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Date & Time</label><input class="form-ctrl" type="datetime-local" id="b-date"></div>
+      <div class="form-group"><label class="form-lbl">Incident Type *</label>
+        <select class="form-ctrl" id="b-type">
+          <option>Physical Altercation</option><option>Verbal Abuse</option><option>Theft</option>
+          <option>Property Damage</option><option>Domestic Violence</option><option>Noise Complaint</option>
+          <option>Trespassing</option><option>Cyber Crime</option><option>Drug Related</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-lbl">Location</label><input class="form-ctrl" id="b-loc"></div>
+    <div class="form-group"><label class="form-lbl">Incident Narrative *</label><textarea class="form-ctrl" id="b-narr" rows="3"></textarea></div>
+    <div class="form-group"><label class="form-lbl">Status</label>
+      <select class="form-ctrl" id="b-stat"><option>Ongoing</option><option>Settled</option><option>Endorsed to PNP</option></select>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeM('blotter')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveBlotter()">Save Entry</button>
+    </div>
+  </div>
+</div>
+
+<!-- OFFICIAL MODAL -->
+<div class="modal-ov" id="m-official">
+  <div class="modal">
+    <div class="modal-ttl">Add Official</div>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px;">
+      <div class="upload-ring" style="width:65px;height:65px;" id="off-photo-prev" onclick="document.getElementById('off-photo-up').click()">
+        <span style="font-size:18px;">👤</span>
+      </div>
+      <div style="font-size:12px;color:var(--text3);">Official photo</div>
+      <input type="file" id="off-photo-up" accept="image/*" style="display:none" onchange="previewOffPhoto(this)">
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Full Name *</label><input class="form-ctrl" id="o-name"></div>
+      <div class="form-group"><label class="form-lbl">Position *</label>
+        <select class="form-ctrl" id="o-pos">
+          <option>Barangay Captain</option><option>Barangay Kagawad</option><option>Barangay Secretary</option>
+          <option>Barangay Treasurer</option><option>SK Chairperson</option><option>SK Kagawad</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Term Start</label><input class="form-ctrl" type="date" id="o-start"></div>
+      <div class="form-group"><label class="form-lbl">Term End</label><input class="form-ctrl" type="date" id="o-end"></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label class="form-lbl">Contact</label><input class="form-ctrl" id="o-con"></div>
+      <div class="form-group"><label class="form-lbl">Committee</label><input class="form-ctrl" id="o-comm" placeholder="e.g., Health, Peace & Order"></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost" onclick="closeM('official')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveOfficial()">Save Official</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ──────────── DATA ────────────
+let db = {
+  citizens:[], documents:[], finance:[], blotter:[], officials:[],
+  settings:{ name:'Barangay System', city:'City / Municipality', prov:'Province', captain:'', contact:'' },
+  counters:{ cit:1000, doc:1, bl:1 },
+  logo: null, avatar: null, sysPassword: '1234'
+};
+let editId = null;
+let citPhotoData = null;
+let offPhotoData = null;
+let portalDocType = '';
+
+function loadDB(){ const s=localStorage.getItem('brgy_online'); if(s){ try{ db=JSON.parse(s); }catch(e){} } }
+function saveDB(){ try{ localStorage.setItem('brgy_online', JSON.stringify(db)); }catch(e){} }
+
+// ──────────── LOGO / AVATAR ────────────
+function uploadLogo(input, target) {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = e.target.result;
+    if(target === 'login') {
+      const el = document.getElementById('login-logo-disp');
+      el.innerHTML = `<img src="${data}">`;
+    }
+    if(target === 'sb' || target === 'settings') {
+      db.logo = data; saveDB();
+      applyLogo();
+    }
+    if(target === 'avatar') {
+      db.avatar = data; saveDB();
+      applyAvatar();
+    }
+  };
+  reader.readAsDataURL(file);
+}
+function applyLogo() {
+  const brgyLetter = (db.settings.name || 'B')[0].toUpperCase();
+  const sbEl = document.getElementById('sb-logo-disp');
+  const loginEl = document.getElementById('login-logo-disp');
+  const prevEl = document.getElementById('logo-preview-settings');
+  if(db.logo) {
+    if(sbEl) sbEl.innerHTML = `<img src="${db.logo}">`;
+    if(loginEl) loginEl.innerHTML = `<img src="${db.logo}">`;
+    if(prevEl) prevEl.innerHTML = `<img src="${db.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  } else {
+    if(sbEl) sbEl.innerHTML = `<span id="sb-logo-letter">${brgyLetter}</span>`;
+    if(loginEl) loginEl.innerHTML = `<span id="login-logo-letter">${brgyLetter}</span>`;
+  }
+}
+function applyAvatar() {
+  const el = document.getElementById('user-av-disp');
+  if(db.avatar) el.innerHTML = `<img src="${db.avatar}">`;
+}
+function previewCitPhoto(input) {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    citPhotoData = e.target.result;
+    const prev = document.getElementById('cit-photo-prev');
+    prev.innerHTML = `<img src="${citPhotoData}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  };
+  reader.readAsDataURL(file);
+}
+function previewOffPhoto(input) {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    offPhotoData = e.target.result;
+    const prev = document.getElementById('off-photo-prev');
+    prev.innerHTML = `<img src="${offPhotoData}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`;
+  };
+  reader.readAsDataURL(file);
+}
+
+// ──────────── LOGIN ────────────
+function doLogin() {
+  const role = document.getElementById('login-role').value;
+  const user = document.getElementById('login-user').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  if(!user) { alert('Enter your username.'); return; }
+  if(pass !== db.sysPassword) { alert('Incorrect password.'); return; }
+  document.getElementById('u-name').textContent = user;
+  document.getElementById('u-role').textContent = role;
+  document.getElementById('user-av-letter').textContent = user[0].toUpperCase();
+  document.getElementById('login-sc').style.display = 'none';
+  applyLogo(); applyAvatar();
+  applySettings();
+  renderDashboard();
+}
+function doLogout() {
+  document.getElementById('login-sc').style.display = 'flex';
+}
+
+// ──────────── NAV ────────────
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => {
+    if((n.getAttribute('onclick')||'').includes("'"+page+"'")) n.classList.add('active');
+  });
+  const titles={dashboard:'Dashboard',citizens:'Citizen Records',documents:'Document Requests',portal:'Resident Portal',finance:'Finance / Treasury',blotter:'Barangay Blotter',officials:'Officials',ai:'AI Assistant',settings:'Settings'};
+  document.getElementById('tb-title').textContent = titles[page]||page;
+  const renders={dashboard:renderDashboard,citizens:renderCitizens,documents:renderDocs,finance:()=>{renderFinStats();renderFinance();},blotter:renderBlotter,officials:renderOfficials,settings:loadSettingsForm};
+  if(renders[page]) renders[page]();
+}
+
+// ──────────── MODAL ────────────
+function openM(type, id=null) {
+  editId = id; citPhotoData=null; offPhotoData=null;
+  if(type==='citizen'){
+    document.getElementById('m-cit-title').textContent = id?'Edit Citizen':'Add Citizen';
+    const flds=['ln','fn','mn','sfx','bd','gnd','cs','nat','addr','con','email','occ','voter','pwd','stat'];
+    flds.forEach(f=>{ const el=document.getElementById('c-'+f); if(el) el.value=''; });
+    document.getElementById('c-nat').value='Filipino';
+    document.getElementById('c-voter').value='Registered Voter';
+    document.getElementById('c-stat').value='Active';
+    document.getElementById('c-pwd').value='No';
+    document.getElementById('cit-photo-prev').innerHTML='<span style="font-size:20px;">👤</span>';
+    if(id){
+      const c=db.citizens.find(x=>x.id==id);
+      if(c){
+        document.getElementById('c-ln').value=c.ln||'';
+        document.getElementById('c-fn').value=c.fn||'';
+        document.getElementById('c-mn').value=c.mn||'';
+        document.getElementById('c-sfx').value=c.sfx||'';
+        document.getElementById('c-bd').value=c.bd||'';
+        document.getElementById('c-gnd').value=c.gnd||'';
+        document.getElementById('c-cs').value=c.cs||'Single';
+        document.getElementById('c-nat').value=c.nat||'Filipino';
+        document.getElementById('c-addr').value=c.addr||'';
+        document.getElementById('c-con').value=c.con||'';
+        document.getElementById('c-email').value=c.email||'';
+        document.getElementById('c-occ').value=c.occ||'';
+        document.getElementById('c-voter').value=c.voter||'Registered Voter';
+        document.getElementById('c-pwd').value=c.pwd||'No';
+        document.getElementById('c-stat').value=c.stat||'Active';
+        if(c.photo){ citPhotoData=c.photo; document.getElementById('cit-photo-prev').innerHTML=`<img src="${c.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`; }
+      }
+    }
+  }
+  if(type==='document'){
+    const today=new Date().toISOString().split('T')[0];
+    document.getElementById('d-date').value=today;
+    document.getElementById('d-fee').value='0';
+    document.getElementById('d-stat').value='Pending';
+    ['name','addr','purpose','remarks'].forEach(f=>document.getElementById('d-'+f).value='');
+  }
+  if(type==='finance'){
+    document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
+    ['amt','desc','or'].forEach(f=>{const el=document.getElementById('f-'+f);if(el)el.value='';});
+  }
+  if(type==='blotter'){
+    document.getElementById('b-date').value=new Date().toISOString().slice(0,16);
+    ['comp','resp','loc','narr'].forEach(f=>document.getElementById('b-'+f).value='');
+  }
+  if(type==='official'){
+    ['name','start','end','con','comm'].forEach(f=>document.getElementById('o-'+f).value='');
+    document.getElementById('off-photo-prev').innerHTML='<span style="font-size:18px;">👤</span>';
+  }
+  document.getElementById('m-'+type).classList.add('open');
+}
+function closeM(type){ document.getElementById('m-'+type).classList.remove('open'); editId=null; }
+document.querySelectorAll('.modal-ov').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }));
+
+// ──────────── HELPERS ────────────
+function age(bd){ if(!bd)return'-'; const t=new Date(),b=new Date(bd); let a=t.getFullYear()-b.getFullYear(); if(t.getMonth()<b.getMonth()||(t.getMonth()===b.getMonth()&&t.getDate()<b.getDate())) a--; return a; }
+function fDate(d){ if(!d)return'-'; return new Date(d).toLocaleDateString('en-PH',{year:'numeric',month:'short',day:'numeric'}); }
+function fPeso(n){ return '₱'+Number(n).toLocaleString('en-PH',{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function badge(s){
+  const m={Active:'bs',Deceased:'bd',Transferred:'bw',Pending:'bw',Approved:'bi','Ready for Pickup':'bp',Released:'bs',Rejected:'bd',Ongoing:'bw',Settled:'bs','Endorsed to PNP':'bd',Income:'bs',Expense:'bd'};
+  return `<span class="badge ${m[s]||'bg'}">${s}</span>`;
+}
+function del(type,id){ return `<button class="btn btn-ghost btn-sm" style="color:var(--danger);font-size:11px" onclick="delRec('${type}',${id})">Del</button>`; }
+function edt(type,id){ return `<button class="btn btn-ghost btn-sm" style="font-size:11px" onclick="openM('${type}',${id})">Edit</button>`; }
+
+// ──────────── CITIZENS ────────────
+function saveCitizen(){
+  const ln=document.getElementById('c-ln').value.trim();
+  const fn=document.getElementById('c-fn').value.trim();
+  const bd=document.getElementById('c-bd').value;
+  const gnd=document.getElementById('c-gnd').value;
+  const addr=document.getElementById('c-addr').value.trim();
+  if(!ln||!fn||!bd||!gnd||!addr){alert('Fill all required fields.');return;}
+  const obj={ id:editId||db.counters.cit++, ln,fn,
+    mn:document.getElementById('c-mn').value.trim(),
+    sfx:document.getElementById('c-sfx').value, bd, gnd,
+    cs:document.getElementById('c-cs').value,
+    nat:document.getElementById('c-nat').value,
+    addr, con:document.getElementById('c-con').value.trim(),
+    email:document.getElementById('c-email').value.trim(),
+    occ:document.getElementById('c-occ').value.trim(),
+    voter:document.getElementById('c-voter').value,
+    pwd:document.getElementById('c-pwd').value,
+    stat:document.getElementById('c-stat').value,
+    photo:citPhotoData||null
+  };
+  if(editId){ const i=db.citizens.findIndex(x=>x.id==editId); if(i>-1)db.citizens[i]=obj; }
+  else db.citizens.push(obj);
+  saveDB(); closeM('citizen'); renderCitizens();
+}
+function renderCitizens(){
+  const q=(document.getElementById('cit-srch')?.value||'').toLowerCase();
+  const fs=document.getElementById('cit-f-status')?.value||'';
+  const fg=document.getElementById('cit-f-gender')?.value||'';
+  let list=db.citizens.filter(c=>{
+    const nm=`${c.ln} ${c.fn} ${c.mn||''}`.toLowerCase();
+    return (!q||nm.includes(q)||(c.addr||'').toLowerCase().includes(q)||String(c.id).includes(q))&&(!fs||c.stat===fs)&&(!fg||c.gnd===fg);
+  });
+  const tb=document.getElementById('cit-tbody'); if(!tb)return;
+  if(!list.length){tb.innerHTML=`<tr><td colspan="9"><div class="empty"><div class="empty-ico">👥</div><p>No citizens found.</p></div></td></tr>`;return;}
+  tb.innerHTML=list.map(c=>`<tr>
+    <td><code style="font-size:10px;">${c.id}</code></td>
+    <td><div class="cit-profile">
+      <div class="cit-av">${c.photo?`<img src="${c.photo}">`:(c.fn[0]+(c.ln[0])||'?')}</div>
+      <div><strong>${c.ln}, ${c.fn}${c.mn?' '+c.mn[0]+'.':''}${c.sfx?' '+c.sfx:''}</strong><br><span style="font-size:10px;color:var(--text3)">${c.cs}</span></div>
+    </div></td>
+    <td>${age(c.bd)}</td><td>${c.gnd}</td>
+    <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.addr}</td>
+    <td>${c.con||'-'}</td>
+    <td><span class="badge ${c.voter==='Registered Voter'?'bs':'bg'}" style="font-size:10px;">${c.voter==='Registered Voter'?'Voter':'Non-voter'}</span></td>
+    <td>${badge(c.stat)}</td>
+    <td style="display:flex;gap:4px;">${edt('citizen',c.id)}${del('citizen',c.id)}</td>
+  </tr>`).join('');
+}
+
+// ──────────── DOCUMENTS ────────────
+function saveDoc(){
+  const nm=document.getElementById('d-name').value.trim();
+  const tp=document.getElementById('d-type').value;
+  const pu=document.getElementById('d-purpose').value.trim();
+  if(!nm||!tp||!pu){alert('Fill all required fields.');return;}
+  const num=String(db.counters.doc++).padStart(6,'0');
+  db.documents.push({
+    id:Date.now(), ctrl:'DOC-'+num, name:nm,
+    addr:document.getElementById('d-addr').value.trim(),
+    type:tp, date:document.getElementById('d-date').value,
+    purpose:pu, fee:parseFloat(document.getElementById('d-fee').value)||0,
+    stat:document.getElementById('d-stat').value,
+    remarks:document.getElementById('d-remarks').value.trim()
+  });
+  saveDB(); closeM('document'); renderDocs();
+}
+function updDocStat(id,stat){
+  const d=db.documents.find(x=>x.id==id);
+  if(d){d.stat=stat;saveDB();renderDocs();}
+}
+function renderDocs(){
+  const q=(document.getElementById('doc-srch')?.value||'').toLowerCase();
+  const ft=document.getElementById('doc-f-type')?.value||'';
+  const fs=document.getElementById('doc-f-status')?.value||'';
+  let list=db.documents.filter(d=>
+    (!q||d.name.toLowerCase().includes(q)||d.ctrl.toLowerCase().includes(q))&&
+    (!ft||d.type===ft)&&(!fs||d.stat===fs)
+  );
+  const tb=document.getElementById('doc-tbody'); if(!tb)return;
+  if(!list.length){tb.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-ico">📄</div><p>No document requests yet.</p></div></td></tr>`;return;}
+  tb.innerHTML=list.map(d=>`<tr>
+    <td><code style="font-size:10px;">${d.ctrl}</code></td>
+    <td><strong>${d.name}</strong><br><span style="font-size:10px;color:var(--text3)">${d.addr||''}</span></td>
+    <td>${d.type}</td><td>${fDate(d.date)}</td>
+    <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.purpose}</td>
+    <td>${fPeso(d.fee)}</td><td>${badge(d.stat)}</td>
+    <td style="display:flex;gap:4px;flex-wrap:wrap;">
+      ${d.stat==='Pending'?`<button class="btn btn-success btn-sm" style="font-size:11px" onclick="updDocStat(${d.id},'Approved')">✓ Approve</button>`:''}
+      ${d.stat==='Approved'?`<button class="btn btn-primary btn-sm" style="font-size:11px" onclick="updDocStat(${d.id},'Ready for Pickup')">Ready</button>`:''}
+      ${d.stat==='Ready for Pickup'?`<button class="btn btn-success btn-sm" style="font-size:11px" onclick="updDocStat(${d.id},'Released')">Released</button>`:''}
+      ${del('document',d.id)}
+    </td>
+  </tr>`).join('');
+}
+
+// ──────────── RESIDENT PORTAL ────────────
+function portalRequest(type){
+  portalDocType=type;
+  document.getElementById('portal-form-title').textContent='Request: '+type;
+  document.getElementById('portal-form-area').style.display='block';
+  ['prt-name','prt-addr','prt-purpose','prt-contact','prt-email'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('portal-form-area').scrollIntoView({behavior:'smooth'});
+}
+function submitPortalRequest(){
+  const nm=document.getElementById('prt-name').value.trim();
+  const addr=document.getElementById('prt-addr').value.trim();
+  const pu=document.getElementById('prt-purpose').value.trim();
+  if(!nm||!addr||!pu){alert('Please fill all required fields.');return;}
+  const num=String(db.counters.doc++).padStart(6,'0');
+  const ctrl='DOC-'+num;
+  db.documents.push({
+    id:Date.now(), ctrl, name:nm, addr,
+    type:portalDocType, date:new Date().toISOString().split('T')[0],
+    purpose:pu, fee:0, stat:'Pending',
+    remarks:'Filed via Resident Portal. Contact: '+document.getElementById('prt-contact').value
+  });
+  saveDB();
+  document.getElementById('portal-form-area').style.display='none';
+  alert(`✅ Request submitted!\nControl No.: ${ctrl}\n\nYou can track your request using this number.`);
+  const ti=document.getElementById('track-input');
+  if(ti) ti.value=ctrl;
+}
+function trackRequest(){
+  const q=document.getElementById('track-input').value.trim();
+  const res=document.getElementById('track-result');
+  if(!q){res.innerHTML='<p style="color:var(--text3);font-size:13px;">Enter a control number to track.</p>';return;}
+  const d=db.documents.find(x=>x.ctrl.toLowerCase()===q.toLowerCase());
+  if(!d){res.innerHTML='<p style="color:var(--danger);font-size:13px;">No request found for this control number.</p>';return;}
+  const steps=['Pending','Approved','Ready for Pickup','Released'];
+  const si=steps.indexOf(d.stat);
+  res.innerHTML=`
+    <div class="card" style="margin-top:0;border:1.5px solid var(--border);">
+      <div style="display:flex;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px;">
+        <div><strong style="font-size:15px;">${d.name}</strong><br><span style="font-size:12px;color:var(--text3)">${d.type}</span></div>
+        <div>${badge(d.stat)}</div>
+      </div>
+      <div style="display:flex;gap:0;margin:16px 0;">
+        ${steps.map((s,i)=>`<div style="flex:1;text-align:center;">
+          <div style="width:28px;height:28px;border-radius:50%;background:${i<=si?'var(--navy)':'var(--border)'};display:inline-flex;align-items:center;justify-content:center;font-size:13px;color:${i<=si?'#fff':'var(--text3)'}">
+            ${i<si?'✓':i+1}
+          </div>
+          <div style="font-size:10px;margin-top:5px;color:${i<=si?'var(--navy)':'var(--text3)'};">${s}</div>
+        </div>${i<steps.length-1?`<div style="flex:0.3;padding-top:14px;"><div style="height:2px;background:${i<si?'var(--navy)':'var(--border)'}"></div></div>`:''}`).join('')}
+      </div>
+      <div style="font-size:12px;color:var(--text2);">Filed: ${fDate(d.date)} &nbsp;|&nbsp; Purpose: ${d.purpose}</div>
+    </div>`;
+}
+
+// ──────────── FINANCE ────────────
+function saveFinance(){
+  const tp=document.getElementById('f-type').value;
+  const dt=document.getElementById('f-date').value;
+  const amt=parseFloat(document.getElementById('f-amt').value);
+  if(!dt||!amt||amt<=0){alert('Fill all required fields.');return;}
+  db.finance.push({ id:Date.now(), type:tp, date:dt, cat:document.getElementById('f-cat').value, desc:document.getElementById('f-desc').value.trim(), amt, or:document.getElementById('f-or').value.trim() });
+  saveDB(); closeM('finance'); renderFinStats(); renderFinance();
+}
+function renderFinStats(){
+  const inc=db.finance.filter(f=>f.type==='Income').reduce((s,f)=>s+f.amt,0);
+  const exp=db.finance.filter(f=>f.type==='Expense').reduce((s,f)=>s+f.amt,0);
+  const el=document.getElementById('fin-stats'); if(!el)return;
+  el.innerHTML=`
+    <div class="stat-card"><div class="stat-ico">📈</div><div class="stat-lbl">Total Income</div><div class="stat-val" style="color:var(--success)">${fPeso(inc)}</div></div>
+    <div class="stat-card"><div class="stat-ico">📉</div><div class="stat-lbl">Total Expenses</div><div class="stat-val" style="color:var(--danger)">${fPeso(exp)}</div></div>
+    <div class="stat-card"><div class="stat-ico">💰</div><div class="stat-lbl">Net Balance</div><div class="stat-val" style="color:${(inc-exp)>=0?'var(--success)':'var(--danger)'}">${fPeso(inc-exp)}</div></div>
+    <div class="stat-card"><div class="stat-ico">🧾</div><div class="stat-lbl">Transactions</div><div class="stat-val">${db.finance.length}</div></div>
+  `;
+}
+function renderFinance(){
+  const ft=document.getElementById('fin-f-type')?.value||'';
+  let list=db.finance.filter(f=>!ft||f.type===ft).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const tb=document.getElementById('fin-tbody'); if(!tb)return;
+  if(!list.length){tb.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="empty-ico">💰</div><p>No transactions yet.</p></div></td></tr>`;return;}
+  tb.innerHTML=list.map(f=>`<tr>
+    <td>${fDate(f.date)}</td><td>${badge(f.type)}</td><td>${f.cat}</td>
+    <td>${f.desc||'-'}</td>
+    <td><strong style="color:${f.type==='Income'?'var(--success)':'var(--danger)'}">${fPeso(f.amt)}</strong></td>
+    <td>${f.or||'-'}</td><td>${del('finance',f.id)}</td>
+  </tr>`).join('');
+}
+
+// ──────────── BLOTTER ────────────
+function saveBlotter(){
+  const comp=document.getElementById('b-comp').value.trim();
+  const resp=document.getElementById('b-resp').value.trim();
+  const narr=document.getElementById('b-narr').value.trim();
+  if(!comp||!resp||!narr){alert('Fill all required fields.');return;}
+  const num=String(db.counters.bl++).padStart(4,'0');
+  db.blotter.push({ id:Date.now(), no:'BLT-'+num, comp, resp, date:document.getElementById('b-date').value, type:document.getElementById('b-type').value, loc:document.getElementById('b-loc').value.trim(), narr, stat:document.getElementById('b-stat').value });
+  saveDB(); closeM('blotter'); renderBlotter();
+}
+function renderBlotter(){
+  const q=(document.getElementById('bl-srch')?.value||'').toLowerCase();
+  const fs=document.getElementById('bl-f-status')?.value||'';
+  let list=db.blotter.filter(b=>(!q||b.comp.toLowerCase().includes(q)||b.resp.toLowerCase().includes(q)||b.no.toLowerCase().includes(q))&&(!fs||b.stat===fs)).sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const tb=document.getElementById('bl-tbody'); if(!tb)return;
+  if(!list.length){tb.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="empty-ico">📋</div><p>No blotter entries.</p></div></td></tr>`;return;}
+  tb.innerHTML=list.map(b=>`<tr>
+    <td><code style="font-size:10px;">${b.no}</code></td>
+    <td>${fDate(b.date)}</td><td>${b.comp}</td><td>${b.resp}</td>
+    <td>${b.type}</td><td>${b.loc||'-'}</td><td>${badge(b.stat)}</td>
+    <td>${del('blotter',b.id)}</td>
+  </tr>`).join('');
+}
+
+// ──────────── OFFICIALS ────────────
+function saveOfficial(){
+  const nm=document.getElementById('o-name').value.trim();
+  if(!nm){alert('Name is required.');return;}
+  db.officials.push({ id:Date.now(), name:nm, pos:document.getElementById('o-pos').value, start:document.getElementById('o-start').value, end:document.getElementById('o-end').value, con:document.getElementById('o-con').value.trim(), comm:document.getElementById('o-comm').value.trim(), photo:offPhotoData||null });
+  saveDB(); closeM('official'); renderOfficials();
+}
+function renderOfficials(){
+  const tb=document.getElementById('off-tbody'); if(!tb)return;
+  if(!db.officials.length){tb.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="empty-ico">🏛️</div><p>No officials listed.</p></div></td></tr>`;return;}
+  tb.innerHTML=db.officials.map(o=>`<tr>
+    <td><div class="cit-av">${o.photo?`<img src="${o.photo}">`:(o.name[0]||'?')}</div></td>
+    <td><strong>${o.name}</strong></td>
+    <td><span class="badge bi">${o.pos}</span></td>
+    <td>${o.comm||'-'}</td>
+    <td>${fDate(o.start)} – ${fDate(o.end)}</td>
+    <td>${o.con||'-'}</td>
+    <td>${del('official',o.id)}</td>
+  </tr>`).join('');
+}
+
+// ──────────── DELETE ────────────
+function delRec(type,id){
+  if(!confirm('Delete this record permanently?'))return;
+  const keys={citizen:'citizens',document:'documents',finance:'finance',blotter:'blotter',official:'officials'};
+  db[keys[type]]=db[keys[type]].filter(x=>x.id!=id);
+  saveDB();
+  const renders={citizen:renderCitizens,document:renderDocs,finance:()=>{renderFinStats();renderFinance();},blotter:renderBlotter,official:renderOfficials};
+  if(renders[type])renders[type]();
+}
+
+// ──────────── DASHBOARD ────────────
+function renderDashboard(){
+  const inc=db.finance.filter(f=>f.type==='Income').reduce((s,f)=>s+f.amt,0);
+  const exp=db.finance.filter(f=>f.type==='Expense').reduce((s,f)=>s+f.amt,0);
+  const el=document.getElementById('dash-stats');
+  if(el) el.innerHTML=`
+    <div class="stat-card"><div class="stat-ico">👥</div><div class="stat-lbl">Total Citizens</div><div class="stat-val">${db.citizens.length}</div><div class="stat-sub">${db.citizens.filter(c=>c.stat==='Active').length} active</div></div>
+    <div class="stat-card"><div class="stat-ico">📄</div><div class="stat-lbl">Document Requests</div><div class="stat-val">${db.documents.length}</div><div class="stat-sub">${db.documents.filter(d=>d.stat==='Pending').length} pending</div></div>
+    <div class="stat-card"><div class="stat-ico">💰</div><div class="stat-lbl">Net Balance</div><div class="stat-val" style="color:${(inc-exp)>=0?'var(--success)':'var(--danger)'};font-size:18px">${fPeso(inc-exp)}</div></div>
+    <div class="stat-card"><div class="stat-ico">📋</div><div class="stat-lbl">Blotter Cases</div><div class="stat-val">${db.blotter.length}</div><div class="stat-sub">${db.blotter.filter(b=>b.stat==='Ongoing').length} ongoing</div></div>
+    <div class="stat-card"><div class="stat-ico">🏛️</div><div class="stat-lbl">Officials</div><div class="stat-val">${db.officials.length}</div></div>
+  `;
+  const dcEl=document.getElementById('dash-doc-chart');
+  if(dcEl){
+    const types=['Barangay Clearance','Barangay Indigency','Barangay Residency','Community Tax Certificate','Business Permit'];
+    const counts=types.map(t=>({t,n:db.documents.filter(d=>d.type===t).length}));
+    const mx=Math.max(...counts.map(c=>c.n),1);
+    const cols=['#1e3e70','#0d9488','#c8963e','#d63939','#6d28d9'];
+    dcEl.innerHTML=counts.map((c,i)=>`<div class="bar-item">
+      <div class="bar-lbl" style="font-size:10px;">${c.t.replace('Barangay ','Brgy. ')}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${(c.n/mx*100)}%;background:${cols[i]};"></div></div>
+      <div class="bar-val">${c.n}</div>
+    </div>`).join('');
+  }
+  const fsEl=document.getElementById('dash-fin-sum');
+  if(fsEl) fsEl.innerHTML=`
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;justify-content:space-between;padding:11px 14px;background:var(--bg);border-radius:var(--r);"><span style="font-size:13px;color:var(--text2)">Total Income</span><strong style="color:var(--success)">${fPeso(inc)}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:11px 14px;background:var(--bg);border-radius:var(--r);"><span style="font-size:13px;color:var(--text2)">Total Expenses</span><strong style="color:var(--danger)">${fPeso(exp)}</strong></div>
+      <div style="display:flex;justify-content:space-between;padding:11px 14px;background:#e6f4ea;border-radius:var(--r);"><span style="font-size:13px;font-weight:700;color:var(--success)">Net Balance</span><strong style="color:var(--success);font-size:16px">${fPeso(inc-exp)}</strong></div>
+    </div>`;
+  const blEl=document.getElementById('dash-blotter');
+  if(blEl){
+    const recent=db.blotter.slice(-5).reverse();
+    if(!recent.length){blEl.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 0">No incidents recorded yet.</p>';return;}
+    blEl.innerHTML=`<table><thead><tr><th>No.</th><th>Date</th><th>Incident</th><th>Complainant</th><th>Status</th></tr></thead><tbody>
+      ${recent.map(b=>`<tr><td><code style="font-size:10px">${b.no}</code></td><td>${fDate(b.date)}</td><td>${b.type}</td><td>${b.comp}</td><td>${badge(b.stat)}</td></tr>`).join('')}
+    </tbody></table>`;
+  }
+  document.getElementById('dash-welcome').textContent='Welcome, '+document.getElementById('u-name').textContent+'!';
+}
+
+// ──────────── SETTINGS ────────────
+function loadSettingsForm(){
+  const s=db.settings;
+  document.getElementById('set-name').value=s.name||'';
+  document.getElementById('set-city').value=s.city||'';
+  document.getElementById('set-prov').value=s.prov||'';
+  document.getElementById('set-captain').value=s.captain||'';
+  document.getElementById('set-contact').value=s.contact||'';
+  if(db.logo){ const prev=document.getElementById('logo-preview-settings'); if(prev) prev.innerHTML=`<img src="${db.logo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`; }
+}
+function saveSettings(){
+  db.settings={ name:document.getElementById('set-name').value.trim(), city:document.getElementById('set-city').value.trim(), prov:document.getElementById('set-prov').value.trim(), captain:document.getElementById('set-captain').value.trim(), contact:document.getElementById('set-contact').value.trim() };
+  saveDB(); applySettings(); alert('Settings saved!');
+}
+function savePassword(){
+  const pw=document.getElementById('set-pw').value;
+  if(!pw){alert('Enter a new password.');return;}
+  db.sysPassword=pw; saveDB(); document.getElementById('set-pw').value=''; alert('Password updated!');
+}
+function applySettings(){
+  const s=db.settings;
+  const n=s.name||'Barangay System';
+  document.getElementById('sb-brgy-name').textContent=n;
+  document.getElementById('sb-loc-name').textContent=s.city+(s.prov?', '+s.prov:'');
+  document.getElementById('login-brgy-name').textContent=n;
+  document.getElementById('sb-logo-letter').textContent=n[0].toUpperCase();
+  document.getElementById('login-logo-letter').textContent=n[0].toUpperCase();
+}
+
+// ──────────── AI ASSISTANT ────────────
+function aiQuery(q){ document.getElementById('ai-input').value=q; sendAI(); }
+async function sendAI(){
+  const inp=document.getElementById('ai-input');
+  const q=inp.value.trim(); if(!q)return;
+  const respEl=document.getElementById('ai-resp');
+  respEl.innerHTML='<span class="ai-thinking">Analyzing barangay data...</span>';
+  inp.value='';
+
+  const inc=db.finance.filter(f=>f.type==='Income').reduce((s,f)=>s+f.amt,0);
+  const exp=db.finance.filter(f=>f.type==='Expense').reduce((s,f)=>s+f.amt,0);
+  const ctx=`You are a helpful AI assistant for ${db.settings.name||'Barangay'}. Here is the current data:
+Citizens: ${db.citizens.length} total, ${db.citizens.filter(c=>c.stat==='Active').length} active, ${db.citizens.filter(c=>c.gnd==='Male').length} male, ${db.citizens.filter(c=>c.gnd==='Female').length} female.
+Documents: ${db.documents.length} total, ${db.documents.filter(d=>d.stat==='Pending').length} pending, ${db.documents.filter(d=>d.stat==='Approved').length} approved, ${db.documents.filter(d=>d.stat==='Released').length} released.
+Finance: Income ₱${inc.toLocaleString()}, Expenses ₱${exp.toLocaleString()}, Net Balance ₱${(inc-exp).toLocaleString()}.
+Blotter: ${db.blotter.length} total, ${db.blotter.filter(b=>b.stat==='Ongoing').length} ongoing.
+Officials: ${db.officials.length} registered.
+Answer the question helpfully in 2-4 sentences.`;
+
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ model:'claude-sonnet-4-20250514', max_tokens:500, system:ctx, messages:[{role:'user',content:q}] })
+    });
+    const data=await res.json();
+    respEl.textContent=data.content?.[0]?.text||'Sorry, I could not get a response.';
+  } catch(e) {
+    respEl.textContent='AI is unavailable right now. Check your connection or API access.';
+  }
+}
+
+// ──────────── INIT ────────────
+function init(){
+  loadDB();
+  const now=new Date();
+  document.getElementById('tb-date').textContent=now.toLocaleDateString('en-PH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  applySettings();
+  applyLogo();
+}
+init();
+</script>
+</body>
+</html>
